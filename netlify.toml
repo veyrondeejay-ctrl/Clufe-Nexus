@@ -1,0 +1,10 @@
+[build]
+  publish = "public"
+  edge_functions = "netlify/edge-functions"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"

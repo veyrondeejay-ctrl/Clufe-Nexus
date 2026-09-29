@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Claude Nexus</title>
+  <meta name="theme-color" content="#faf9f5" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#262624" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" id="hljs-light" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" id="hljs-dark" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" crossorigin="anonymous" disabled>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Login -->
+  <div id="login" class="login hidden">
+    <form id="login-form" class="login-card">
+      <div class="brand-mark large" aria-hidden="true"></div>
+      <h1 class="serif">Claude Nexus</h1>
+      <p class="muted">Enter your app password to continue.</p>
+      <input id="login-password" type="password" autocomplete="current-password" placeholder="Password" required>
+      <label class="check"><input id="login-remember" type="checkbox" checked> Remember on this device</label>
+      <button type="submit" class="btn primary">Unlock</button>
+      <p id="login-error" class="error-text" role="alert"></p>
+    </form>
+  </div>
+
+  <div id="app" class="app hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span class="serif">Claude Nexus</span></div>
+        <button id="close-sidebar" class="icon-btn only-mobile" title="Close sidebar" aria-label="Close sidebar">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <button id="new-chat" class="btn new-chat">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New chat
+      </button>
+      <div class="search-wrap">
+        <input id="search" type="search" placeholder="Search chats">
+      </div>
+      <nav id="chat-list" class="chat-list" aria-label="Chats"></nav>
+      <div class="sidebar-bottom">
+        <button id="open-settings" class="btn ghost full">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+          Settings
+        </button>
+      </div>
+    </aside>
+    <div id="scrim" class="scrim"></div>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="topbar">
+        <button id="open-sidebar" class="icon-btn only-mobile" title="Chats" aria-label="Open chats">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="model-picker">
+          <select id="model" aria-label="Model"></select>
+        </div>
+        <div class="topbar-title" id="chat-title"></div>
+        <button id="new-chat-top" class="icon-btn" title="New chat" aria-label="New chat">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        </button>
+      </header>
+
+      <section id="messages" class="messages" aria-live="polite"></section>
+
+      <div id="welcome" class="welcome hidden">
+        <div class="brand-mark large" aria-hidden="true"></div>
+        <h2 class="serif" id="greeting">How can I help you today?</h2>
+      </div>
+
+      <div class="composer-wrap">
+        <form id="composer" class="composer">
+          <div id="attachments" class="attachments"></div>
+          <textarea id="input" rows="1" placeholder="Message Claude…" aria-label="Message"></textarea>
+          <div class="composer-bar">
+            <div class="left-tools">
+              <label class="icon-btn" title="Attach files (images, PDFs, text, code)">
+                <svg viewBox="0 0 24 24"><path d="M21.4 11.1l-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg>
+                <input id="file-input" type="file" multiple hidden>
+              </label>
+              <button type="button" id="toggle-search" class="chip" aria-pressed="false" title="Let Claude search the web">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                <span>Web search</span>
+              </button>
+              <label class="chip select-chip" title="Extended thinking">
+                <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>
+                <select id="thinking" aria-label="Thinking">
+                  <option value="off">Thinking off</option>
+                  <option value="low">Thinking: low</option>
+                  <option value="medium">Thinking: medium</option>
+                  <option value="high">Thinking: high</option>
+                </select>
+              </label>
+            </div>
+            <button type="submit" id="send" class="send-btn" title="Send (Enter)" aria-label="Send">
+              <svg class="i-send" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+              <svg class="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>
+            </button>
+          </div>
+        </form>
+        <p class="footnote">Uses your Anthropic API credits. Claude can make mistakes.</p>
+      </div>
+      <div id="drop-overlay" class="drop-overlay hidden">Drop files to attach</div>
+    </main>
+  </div>
+
+  <!-- Settings dialog -->
+  <dialog id="settings" class="dialog">
+    <form method="dialog" class="dialog-body" id="settings-form">
+      <header class="dialog-head">
+        <h2 class="serif">Settings</h2>
+        <button class="icon-btn" value="cancel" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </header>
+      <label class="field">
+        <span>System prompt</span>
+        <textarea id="set-system" rows="6"></textarea>
+        <small class="muted">Sent at the start of every chat. <code>{date}</code> is replaced with today's date.</small>
+      </label>
+      <label class="field">
+        <span>Max reply length (tokens)</span>
+        <input id="set-max-tokens" type="number" min="256" max="128000" step="256">
+      </label>
+      <label class="field">
+        <span>Theme</span>
+        <select id="set-theme">
+          <option value="system">Match system</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <div class="field">
+        <span>Your chats</span>
+        <small class="muted">Chats are saved in this browser only. Export them to move to another device.</small>
+        <div class="row">
+          <button type="button" id="export-chats" class="btn">Export</button>
+          <label class="btn">Import<input id="import-chats" type="file" accept="application/json" hidden></label>
+          <button type="button" id="delete-all" class="btn danger">Delete all</button>
+        </div>
+      </div>
+      <div class="field">
+        <span>Usage</span>
+        <small class="muted" id="usage-summary"></small>
+      </div>
+      <footer class="dialog-foot">
+        <button type="button" id="lock" class="btn ghost">Lock app</button>
+        <button type="button" id="reset-settings" class="btn ghost">Reset defaults</button>
+        <button value="save" id="save-settings" class="btn primary">Save</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js" crossorigin="anonymous"></script>
+  <script src="app.js"></script>
+</body>
+</html>

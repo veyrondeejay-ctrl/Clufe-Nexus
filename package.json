@@ -1,0 +1,12 @@
+{
+  "name": "claude-nexus",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal Claude chat app on your own Anthropic API key, hosted on Netlify.",
+  "type": "module",
+  "scripts": {
+    "dev": "node test/dev-server.mjs",
+    "dev:mock": "MOCK=1 APP_PASSWORD=test node test/dev-server.mjs"
+  },
+  "engines": { "node": ">=18" }
+}
